@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="light">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>الجغرافيا التفاعلية | الصف السابع — إعداد الطالب: كنان العارضة</title>
+<style>
+/* ================= المتغيرات والألوان ================= */
+:root{
+  --bg1:#e8f2ff; --bg2:#f8fbff;
+  --surface:#ffffff; --surface-2:#f1f7ff;
+  --text:#0f2744; --muted:#5b7391;
+  --primary:#2563eb; --primary-2:#06b6d4;
+  --accent:#f59e0b; --success:#16a34a; --danger:#dc2626;
+  --border:#d8e6f8; --shadow:0 12px 32px rgba(23,68,145,.13);
+  --radius:18px;
+}
+html[data-theme="dark"]{
+  --bg1:#060c18; --bg2:#0d1628;
+  --surface:#121e33; --surface-2:#182741;
+  --text:#e9f1ff; --muted:#9bb0cd;
+  --primary:#4f8cff; --primary-2:#22d3ee;
+  --border:#24374f; --shadow:0 12px 32px rgba(0,0,0,.5);
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  margin:0;
+  font-family:"Segoe UI","Tahoma",system-ui,-apple-system,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(1000px 500px at 12% -5%, var(--bg1), transparent 60%),
+    radial-gradient(800px 500px at 95% 0%, rgba(6,182,212,.16), transparent 60%),
+    var(--bg2);
+  background-attachment:fixed;
+  min-height:100vh;
+  transition:background .4s ease, color .4s ease;
+  line-height:1.7;
+}
+/* ================= الشريط العلوي ================= */
+.topbar{
+  position:sticky; top:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:12px 18px;
+  background:color-mix(in srgb, var(--surface) 82%, transparent);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+}
+.brand{display:flex; align-items:center; gap:12px;}
+.logo{
+  width:48px;height:48px;flex:0 0 48px;border-radius:14px;
+  display:grid;place-items:center;font-size:26px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  box-shadow:0 8px 20px rgba(37,99,235,.35);
+}
+.brand h1{margin:0;font-size:1.15rem;letter-spacing:.2px;}
+.brand .tag{font-size:.76rem;color:var(--muted);margin-top:-4px;}
+.theme-btn{
+  border:1px solid var(--border); background:var(--surface-2); color:var(--text);
+  padding:9px 16px; border-radius:999px; cursor:pointer; font-size:.9rem; font-weight:700;
+  font-family:inherit; transition:.25s; white-space:nowrap;
+}
+.theme-btn:hover{transform:translateY(-2px); box-shadow:var(--shadow); border-color:var(--primary);}
+/* ================= الحاويات ================= */
+.wrap{max-width:1120px;margin:0 auto;padding:22px 16px 40px;}
+.screen{display:none; animation:fade .45s ease;}
+.screen.active{display:block;}
+@keyframes fade{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
+.card{
+  background:var(--surface); border:1px solid var(--border);
+  border-radius:var(--radius); box-shadow:var(--shadow); padding:22px;
+}
+/* ================= الصفحة الرئيسية ================= */
+.hero{text-align:center; padding:26px 14px 6px;}
+.hero .hero-emoji{
+  font-size:64px; line-height:1; display:inline-block;
+  animation:float 3.5s ease-in-out infinite;
+  filter:drop-shadow(0 10px 18px rgba(37,99,235,.35));
+}
+@keyframes float{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-14px) rotate(3deg);}}
+.hero h2{
+  margin:10px 0 6px; font-size:clamp(1.4rem,4vw,2.1rem);
+  background:linear-gradient(90deg,var(--primary),var(--primary-2));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero p.sub{color:var(--muted); max-width:640px; margin:0 auto; font-size:.98rem;}
+.name-card{margin-top:22px;}
+.name-card label{display:block;font-weight:700;margin-bottom:10px;font-size:1rem;}
+.name-card input{
+  width:100%; padding:15px 16px; font-size:1.05rem; font-family:inherit;
+  border-radius:14px; border:2px solid var(--border); background:var(--surface-2);
+  color:var(--text); outline:none; transition:.25s;
+}
+.name-card input:focus{border-color:var(--primary); box-shadow:0 0 0 4px rgba(37,99,235,.16);}
+.error{color:var(--danger); font-weight:700; font-size:.88rem; min-height:20px; margin:8px 0 0;}
+.modes{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:18px; margin-top:22px;}
+.mode-btn{
+  cursor:pointer; border:none; font-family:inherit; color:#fff; text-align:right;
+  padding:26px 22px; border-radius:22px; position:relative; overflow:hidden;
+  transition:transform .25s, box-shadow .25s; box-shadow:0 14px 30px rgba(0,0,0,.18);
+}
+.mode-btn:hover{transform:translateY(-6px) scale(1.015);}
+.mode-btn.cards{background:linear-gradient(135deg,#2563eb,#22d3ee);}
+.mode-btn.quiz{background:linear-gradient(135deg,#f59e0b,#ef4444);}
+.mode-btn .m-emoji{font-size:38px; display:block; margin-bottom:6px;}
+.mode-btn .m-title{font-size:1.25rem; font-weight:800; display:block;}
+.mode-btn .m-desc{font-size:.86rem; opacity:.92; display:block; margin-top:4px;}
+.mode-btn::after{
+  content:""; position:absolute; width:170px;height:170px;border-radius:50%;
+  background:rgba(255,255,255,.13); top:-70px; left:-50px;
+}
+.info-strip{
+  margin-top:22px; display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px;
+}
+.info-strip div{
+  background:var(--surface-2); border:1px solid var(--border); border-radius:14px;
+  padding:12px; text-align:center; font-weight:700; font-size:.88rem;
+}
+.info-strip span{display:block; font-size:1.4rem;}
+/* ================= الأزرار العامة ================= */
+.btn{
+  font-family:inherit; cursor:pointer; border-radius:12px; padding:12px 20px;
+  font-size:.95rem; font-weight:700; border:1px solid var(--border);
+  background:var(--surface-2); color:var(--text); transition:.22s;
+}
+.btn:hover{transform:translateY(-2px); box-shadow:var(--shadow);}
+.btn.primary{background:linear-gradient(135deg,var(--primary),var(--primary-2)); color:#fff; border:none;}
+.btn.ghost{background:transparent;}
+.btn.gold{background:linear-gradient(135deg,#f59e0b,#f97316); color:#fff; border:none;}
+.btn.hidden{display:none;}
+.section-head{
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  flex-wrap:wrap; margin-bottom:16px;
+}
+.section-head h2{margin:0; font-size:1.3rem;}
+.section-head .hint{color:var(--muted); font-size:.85rem;}
+/* ================= البطاقات التعليمية ================= */
+.cards-grid{
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:18px;
+}
+.flashcard{height:305px; perspective:1200px; cursor:pointer;}
+.fc-inner{
+  position:relative; width:100%; height:100%;
+  transition:transform .7s cubic-bezier(.4,.2,.2,1); transform-style:preserve-3d;
+}
+.flashcard.flipped .fc-inner{transform:rotateY(180deg);}
+.fc-face{
+  position:absolute; inset:0; border-radius:var(--radius);
+  backface-visibility:hidden; -webkit-backface-visibility:hidden;
+  padding:16px; overflow-y:auto; border:1px solid var(--border);
+  box-shadow:var(--shadow); display:flex; flex-direction:column;
+}
+.fc-front{background:linear-gradient(160deg,var(--surface),var(--surface-2));}
+.fc-back{background:linear-gradient(160deg,#e8fff1,#d6f7e6); transform:rotateY(180deg); color:#0b3d24;}
+html[data-theme="dark"] .fc-back{background:linear-gradient(160deg,#0e2a1d,#123a28); color:#d9ffe9;}
+.fc-num{
+  align-self:flex-start; background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  color:#fff; font-size:.75rem; font-weight:800; padding:3px 11px; border-radius:999px; margin-bottom:8px;
+}
+.fc-q{font-weight:800; font-size:.98rem; margin:0 0 8px;}
+.fc-opts{list-style:none; margin:0; padding:0; display:grid; gap:5px; font-size:.78rem; color:var(--muted);}
+.fc-opts li{background:var(--surface-2); border-radius:9px; padding:5px 9px; border:1px solid var(--border);}
+html[data-theme="dark"] .fc-opts li{background:rgba(255,255,255,.05);}
+.fc-hint{margin-top:auto; font-size:.74rem; color:var(--primary); font-weight:700; text-align:center; padding-top:8px;}
+.fc-answer{font-weight:800; font-size:.95rem; margin:0 0 8px;}
+.fc-answer b{color:#16a34a;}
+.fc-exp{font-size:.83rem; margin:0; line-height:1.75;}
+.fc-topic{
+  align-self:flex-start; font-size:.7rem; font-weight:700; padding:3px 10px;
+  border-radius:999px; background:rgba(37,99,235,.14); color:var(--primary); margin-bottom:8px;
+}
+/* ================= الاختبار ================= */
+.quiz-shell{max-width:820px; margin:0 auto;}
+.quiz-top{display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between; margin-bottom:12px;}
+.chips{display:flex; gap:8px; flex-wrap:wrap;}
+.chip{
+  background:var(--surface-2); border:1px solid var(--border); border-radius:999px;
+  padding:6px 14px; font-size:.83rem; font-weight:800;
+}
+.chip.ok{color:var(--success); border-color:rgba(22,163,74,.4);}
+.chip.bad{color:var(--danger); border-color:rgba(220,38,38,.4);}
+.progress-track{
+  height:9px; border-radius:999px; background:var(--surface-2);
+  border:1px solid var(--border); overflow:hidden; margin-bottom:16px;
+}
+.progress-fill{
+  height:100%; width:0%; border-radius:999px;
+  background:linear-gradient(90deg,var(--primary),var(--primary-2));
+  transition:width .4s ease;
+}
+.timer-row{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+.timer-track{
+  flex:1; height:16px; border-radius:999px; background:var(--surface-2);
+  border:1px solid var(--border); overflow:hidden;
+}
+.timer-fill{
+  height:100%; width:100%; border-radius:999px;
+  background:linear-gradient(90deg,#16a34a,#22c55e);
+  transition:width .1s linear, background .35s linear;
+}
+.timer-text{
+  font-weight:900; font-size:.95rem; min-width:56px; text-align:center;
+  background:var(--surface-2); border:1px solid var(--border); border-radius:10px; padding:2px 6px;
+}
+.question-box{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:20px; box-shadow:var(--shadow); margin-bottom:16px;
+}
+.question-box .q-label{
+  font-size:.76rem; font-weight:800; color:var(--primary);
+  background:rgba(37,99,235,.12); padding:3px 12px; border-radius:999px; display:inline-block; margin-bottom:10px;
+}
+.question-box p.q-text{margin:0; font-size:1.12rem; font-weight:800; line-height:1.9;}
+.options{display:grid; gap:11px;}
+.option{
+  display:flex; align-items:center; gap:12px; text-align:right; width:100%;
+  font-family:inherit; font-size:.98rem; font-weight:600; cursor:pointer;
+  padding:14px 16px; border-radius:14px;
+  background:var(--surface-2); color:var(--text);
+  border:2px solid var(--border); transition:.2s;
+}
+.option:hover:not(:disabled){border-color:var(--primary); transform:translateX(-4px);}
+.option:disabled{cursor:default;}
+.option .letter{
+  flex:0 0 34px; height:34px; border-radius:50%; display:grid; place-items:center;
+  background:linear-gradient(135deg,var(--primary),var(--primary-2)); color:#fff;
+  font-weight:900; font-size:.9rem;
+}
+.option.correct{
+  border-color:#16a34a; background:rgba(22,163,74,.14);
+  animation:pulseOk .5s ease;
+}
+.option.correct .letter{background:linear-gradient(135deg,#16a34a,#22c55e);}
+.option.wrong{
+  border-color:#dc2626; background:rgba(220,38,38,.13);
+  animation:shake .45s ease;
+}
+.option.wrong .letter{background:linear-gradient(135deg,#dc2626,#ef4444);}
+@keyframes pulseOk{0%{transform:scale(1);}50%{transform:scale(1.025);}100%{transform:scale(1);}}
+@keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-7px);}75%{transform:translateX(7px);}}
+.feedback{
+  margin-top:16px; padding:16px; border-radius:16px; border:2px dashed var(--border);
+  background:var(--surface); animation:fade .35s ease; font-size:.94rem;
+}
+.feedback.good{border-color:rgba(22,163,74,.55); background:rgba(22,163,74,.09);}
+.feedback.bad{border-color:rgba(220,38,38,.5); background:rgba(220,38,38,.08);}
+.feedback.warn{border-color:rgba(245,158,11,.6); background:rgba(245,158,11,.1);}
+.feedback h4{margin:0 0 8px; font-size:1rem;}
+.feedback p{margin:5px 0;}
+.feedback .exp{color:var(--muted); font-size:.88rem;}
+.feedback.hidden{display:none;}
+.quiz-actions{display:flex; justify-content:flex-end; margin-top:16px;}
+/* ================= الشهادة ================= */
+.cert-outer{max-width:900px;margin:0 auto;}
+.cert-card{
+  background:var(--surface); border:3px double var(--primary);
+  border-radius:22px; padding:28px 24px; box-shadow:var(--shadow); position:relative; overflow:hidden;
+}
+.cert-card::before{
+  content:""; position:absolute; inset:10px; border:1px solid var(--border);
+  border-radius:16px; pointer-events:none;
+}
+.cert-head{text-align:center; position:relative; z-index:1;}
+.cert-head .seal{
+  width:82px;height:82px;margin:0 auto 8px;border-radius:50%;
+  display:grid;place-items:center;font-size:40px;
+  background:linear-gradient(135deg,var(--primary),var(--primary-2));
+  box-shadow:0 10px 26px rgba(37,99,235,.4);
+}
+.cert-head h2{margin:4px 0; font-size:clamp(1.3rem,4vw,1.9rem);}
+.cert-head .line{color:var(--muted); font-size:.86rem;}
+.cert-name{
+  text-align:center; margin:18px 0 6px; font-size:clamp(1.3rem,4.5vw,2rem); font-weight:900;
+  background:linear-gradient(90deg,var(--primary),var(--primary-2));
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.cert-sub{text-align:center; color:var(--muted); margin:0 0 18px; font-size:.9rem;}
+.score-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:12px; margin-bottom:20px;}
+.score-box{
+  background:var(--surface-2); border:1px solid var(--border); border-radius:14px;
+  padding:14px 10px; text-align:center;
+}
+.score-box .v{font-size:1.5rem; font-weight:900; display:block; line-height:1.3;}
+.score-box .l{font-size:.78rem; color:var(--muted); font-weight:700;}
+.score-box.green .v{color:var(--success);}
+.score-box.red .v{color:var(--danger);}
+.score-box.blue .v{color:var(--primary);}
+.big-bar{
+  height:22px; border-radius:999px; background:var(--surface-2); border:1px solid var(--border);
+  overflow:hidden; margin:6px 0 22px;
+}
+.big-bar > div{
+  height:100%; border-radius:999px;
+  background:linear-gradient(90deg,#16a34a,#22c55e,#84cc16);
+  display:flex; align-items:center; justify-content:center;
+  color:#fff; font-weight:900; font-size:.8rem; transition:width 1s ease;
+}
+.analysis h3{
+  font-size:1.05rem; margin:18px 0 10px; display:flex; align-items:center; gap:8px;
+  border-right:5px solid var(--primary); padding-right:10px;
+}
+.topic-row{margin-bottom:12px;}
+.topic-row .t-top{display:flex; justify-content:space-between; font-size:.86rem; font-weight:700; margin-bottom:4px;}
+.topic-track{height:12px;border-radius:999px;background:var(--surface-2);border:1px solid var(--border);overflow:hidden;}
+.topic-track > div{height:100%;border-radius:999px;transition:width 1s ease;}
+.tags{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px;}
+.tag-pill{
+  padding:7px 14px; border-radius:999px; font-size:.83rem; font-weight:800;
+  border:1px solid var(--border); background:var(--surface-2);
+}
+.tag-pill.good{color:var(--success); border-color:rgba(22,163,74,.45); background:rgba(22,163,74,.1);}
+.tag-pill.bad{color:var(--danger); border-color:rgba(220,38,38,.45); background:rgba(220,38,38,.09);}
+.missed-list{margin:8px 0 0; padding:0; list-style:none; display:grid; gap:8px;}
+.missed-list li{
+  background:var(--surface-2); border:1px solid var(--border); border-radius:12px;
+  padding:10px 12px; font-size:.85rem;
+}
+.missed-list li b{color:var(--success);}
+.cert-sign{
+  margin-top:26px; padding-top:16px; border-top:2px dashed var(--border);
+  display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap;
+}
+.cert-sign .sig{font-weight:900; font-size:1rem;}
+.cert-sign .sig small{display:block; color:var(--muted); font-weight:600; font-size:.76rem;}
+.cert-actions{display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:22px;}
+/* ================= التذييل ================= */
+.footer{
+  text-align:center; padding:26px 16px 40px; color:var(--muted); font-size:.9rem;
+}
+.footer .dedication{
+  display:inline-block; padding:12px 26px; border-radius:999px;
+  background:linear-gradient(135deg,rgba(37,99,235,.12),rgba(6,182,212,.12));
+  border:1px dashed var(--primary); color:var(--text); font-weight:800;
+}
+.footer .dedication strong{color:var(--primary);}
+/* ================= استجابة الشاشات ================= */
+@media (max-width:640px){
+  .topbar{padding:10px 12px;}
+  .brand h1{font-size:1rem;}
+  .brand .tag{font-size:.68rem;}
+  .logo{width:42px;height:42px;flex:0 0 42px;font-size:22px;}
+  .theme-btn{padding:8px 12px; font-size:.8rem;}
+  .flashcard{height:325px;}
+  .question-box p.q-text{font-size:1rem;}
+  .option{font-size:.9rem; padding:12px 13px;}
+  .cert-card{padding:20px 14px;}
+}
+/* ================= الطباعة ================= */
+@media print{
+  body{background:#fff !important; color:#000 !important;}
+  .topbar,.footer,.cert-actions,.no-print{display:none !important;}
+  .screen{display:none !important;}
+  #screen-cert{display:block !important;}
+  .wrap{padding:0; max-width:100%;}
+  .cert-card{
+    box-shadow:none !important; border:3px double #1e40af !important;
+    background:#fff !important; color:#000 !important; page-break-inside:avoid;
+  }
+  .cert-card::before{border-color:#93c5fd !important;}
+  .cert-head h2,.cert-name{color:#1e40af !important; -webkit-text-fill-color:#1e40af !important;}
+  .score-box,.topic-track,.big-bar,.missed-list li,.tag-pill{
+    background:#f8fafc !important; border-color:#cbd5e1 !important;
+  }
+  .cert-head .seal{background:#1e40af !important; color:#fff !important;}
+  .score-box .v{color:#0f172a !important;}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= الشريط العلوي ================= -->
+<header class="topbar">
+  <div class="brand">
+    <div class="logo">🌍</div>
+    <div>
+      <h1>الجغرافيا التفاعلية — الصف السابع</h1>
+      <div class="tag">إعداد وتصميم الطالب: كنان العارضة</div>
+    </div>
+  </div>
+  <button id="themeBtn" class="theme-btn" type="button">🌙 الوضع الليلي</button>
+</header>
+
+<div class="wrap">
+
+  <!-- ================= الصفحة الرئيسية ================= -->
+  <section id="screen-home" class="screen active">
+    <div class="hero">
+      <div class="hero-emoji">🌍</div>
+      <h2>مرحباً بك في رحلة الجغرافيا</h2>
+      <p class="sub">
+        موقع تعليمي تفاعلي لمراجعة مادة الجغرافيا للصف السابع، يضم <strong>24 سؤالاً</strong> في:
+        الإحداثيات الجغرافية، التضاريس، البراكين، الزلازل، والتجوية والترسيب.
+      </p>
+    </div>
+
+    <div class="card name-card">
+      <label for="studentName">✍️ اكتب اسمك الثنائي (الاسم الأول + اسم العائلة) قبل البدء:</label>
+      <input id="studentName" type="text" placeholder="مثال: كنان العارضة" autocomplete="off" />
+      <p id="nameError" class="error"></p>
+    </div>
+
+    <div class="modes">
+      <button class="mode-btn cards" id="btnCards" type="button">
+        <span class="m-emoji">🃏</span>
+        <span class="m-title">قسم البطاقات التعليمية</span>
+        <span class="m-desc">24 بطاقة تفاعلية تنقلب عند النقر لتعرض الإجابة والشرح المبسّط.</span>
+      </button>
+      <button class="mode-btn quiz" id="btnQuiz" type="button">
+        <span class="m-emoji">🏆</span>
+        <span class="m-title">قسم الاختبار والتحدي</span>
+        <span class="m-desc">30 ثانية لكل سؤال + ترتيب عشوائي + شهادة إنجاز وتحليل مفصّل في النهاية.</span>
+      </button>
+    </div>
+
+    <div class="info-strip">
+      <div><span>📚</span> 24 سؤالاً</div>
+      <div><span>⏱️</span> 30 ثانية / سؤال</div>
+      <div><span>🔀</span> ترتيب عشوائي</div>
+      <div><span>🎓</span> شهادة إنجاز</div>
+    </div>
+  </section>
+
+  <!-- ================= قسم البطاقات ================= -->
+  <section id="screen-cards" class="screen">
+    <div class="section-head">
+      <div>
+        <h2>🃏 البطاقات التعليمية</h2>
+        <div class="hint">انقر على أي بطاقة لتقلبها وترى الإجابة الصحيحة مع الشرح.</div>
+      </div>
+      <button class="btn ghost" data-home type="button">🏠 العودة للرئيسية</button>
+    </div>
+    <div id="cardsGrid" class="cards-grid"></div>
+  </section>
+
+  <!-- ================= قسم الاختبار ================= -->
+  <section id="screen-quiz" class="screen">
+    <div class="quiz-shell">
+      <div class="section-head">
+        <h2>🏆 اختبار التحدي</h2>
+        <button class="btn ghost" id="quitQuiz" type="button">🏠 إنهاء والعودة</button>
+      </div>
+
+      <div class="quiz-top">
+        <div class="chips">
+          <span class="chip" id="qCounter">السؤال 1 من 24</span>
+          <span class="chip ok" id="chipCorrect">✔ 0</span>
+          <span class="chip bad" id="chipWrong">✘ 0</span>
+        </div>
+        <span class="chip" id="chipName">👤 الطالب</span>
+      </div>
+
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+
+      <div class="timer-row">
+        <span style="font-weight:800;font-size:.85rem;">⏱️ الوقت</span>
+        <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+        <div class="timer-text" id="timerText">30 ث</div>
+      </div>
+
+      <div class="question-box">
+        <span class="q-label" id="topicLabel">الموضوع</span>
+        <p class="q-text" id="questionText">نص السؤال</p>
+      </div>
+
+      <div class="options" id="optionsWrap"></div>
+
+      <div class="feedback hidden" id="feedback"></div>
+
+      <div class="quiz-actions">
+        <button class="btn primary hidden" id="nextBtn" type="button">السؤال التالي »</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= الشهادة ================= -->
+  <section id="screen-cert" class="screen">
+    <div class="cert-outer">
+      <div class="cert-card" id="certificate">
+        <div class="cert-head">
+          <div class="seal">🏅</div>
+          <h2>شهادة إنجاز وتقييم</h2>
+          <div class="line">مادة الجغرافيا — الصف السابع</div>
+        </div>
+
+        <div class="cert-name" id="certName">—</div>
+        <p class="cert-sub">أتمّ بنجاح اختبار الجغرافيا التفاعلي المكوّن من 24 سؤالاً</p>
+
+        <div class="score-grid">
+          <div class="score-box blue"><span class="v" id="certScore">0 / 24</span><span class="l">الدرجة الكلية</span></div>
+          <div class="score-box blue"><span class="v" id="certPct">0%</span><span class="l">النسبة المئوية</span></div>
+          <div class="score-box green"><span class="v" id="certCorrect">0</span><span class="l">إجابات صحيحة</span></div>
+          <div class="score-box red"><span class="v" id="certWrong">0</span><span class="l">إجابات خاطئة</span></div>
+        </div>
+
+        <div class="big-bar"><div id="certBar" style="width:0%">0%</div></div>
+
+        <div class="analysis">
+          <h3>📊 التحليل التفصيلي حسب الموضوعات</h3>
+          <div id="topicAnalysis"></div>
+
+          <h3>💪 نقاط القوة</h3>
+          <div class="tags" id="strengths"></div>
+
+          <h3>📌 نقاط تحتاج إلى مراجعة</h3>
+          <div class="tags" id="weaknesses"></div>
+
+          <h3>📝 أسئلة يُنصح بمراجعتها</h3>
+          <ul class="missed-list" id="missedList"></ul>
+        </div>
+
+        <div class="cert-sign">
+          <div class="sig">
+            إعداد وتصميم الطالب: كنان العارضة
+            <small>مشروع تعليمي تفاعلي — مادة الجغرافيا</small>
+          </div>
+          <div class="sig">
+            📅 التاريخ: <span id="certDate">—</span>
+            <small>شهادة صادرة إلكترونياً</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-actions no-print">
+        <button class="btn gold" id="printBtn" type="button">🖨️ طباعة / تحميل الشهادة PDF</button>
+        <button class="btn primary" id="retryBtn" type="button">🔄 إعادة الاختبار</button>
+        <button class="btn ghost" data-home type="button">🏠 العودة للرئيسية</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ================= التذييل ================= -->
+<footer class="footer">
+  <div class="dedication">
+    🎓 إهداء وتوقيع: <strong>عمل الطالب: كنان العارضة</strong>
+  </div>
+</footer>
+
+<script>
+/* ==========================================================
+   1) بنك الأسئلة الـ 24
+   ========================================================== */
+const QUESTIONS = [
+  {
+    q: "عَرّف الإحداثيات الجغرافية:",
+    options: [
+      "هي تشابك خطوط الطول مع دوائر العرض.",
+      "هي تقاطع دوائر العرض مع خطوط الطول.",
+      "هي التقاء خطوط العرض مع دوائر الطول.",
+      "هي تقاطع خطوط الطول مع دوائر العرض."
+    ],
+    correct: 3,
+    topic: "الإحداثيات الجغرافية",
+    explanation: "الإحداثيات الجغرافية هي نقطة تقاطع خطوط الطول مع دوائر العرض، وهي شبكة وهمية تُغطّي الكرة الأرضية وتُستخدم لتحديد موقع أي مكان عليها بدقة."
+  },
+  {
+    q: "سَمّ دائرة العرض الأساسية التي تقسم الكرة الأرضية إلى نصفين:",
+    options: [
+      "خط الاستواء",
+      "مدار الاستواء",
+      "محور الاستواء",
+      "دائرة الاستواء"
+    ],
+    correct: 0,
+    topic: "الإحداثيات الجغرافية",
+    explanation: "خط الاستواء هو دائرة العرض الأساسية (درجة صفر) ويقسم الكرة الأرضية إلى نصف شمالي ونصف جنوبي."
+  },
+  {
+    q: "عَلّل: ما أهمية الإحداثيات الجغرافية؟",
+    options: [
+      "لتحديد المناخ في منطقة ما على سطح الأرض.",
+      "لتحديد موقع ما على سطح الأرض.",
+      "لتحديد حركة الأرض حول الشمس.",
+      "لتحديد ظاهرة الليل والنهار على الأرض."
+    ],
+    correct: 1,
+    topic: "الإحداثيات الجغرافية",
+    explanation: "الأهمية الأساسية للإحداثيات هي تحديد الموقع بدقة على سطح الأرض، أما المناخ وحركة الأرض والليل والنهار فترتبط بعوامل أخرى كخطوط العرض والحركة المحورية والدورانية."
+  },
+  {
+    q: "أين يقع مدار السرطان؟",
+    options: [
+      "في النصف الجنوبي من الكرة الأرضية.",
+      "في النصف الشرقي من الكرة الأرضية.",
+      "في النصف الشمالي من الكرة الأرضية.",
+      "على خط الاستواء مباشرة."
+    ],
+    correct: 2,
+    topic: "الإحداثيات الجغرافية",
+    explanation: "مدار السرطان يقع في النصف الشمالي من الكرة الأرضية عند دائرة عرض 23.5° شمالاً، وهو الحد الشمالي لتعامد أشعة الشمس."
+  },
+  {
+    q: "أين يقع مدار الجدي؟",
+    options: [
+      "في النصف الجنوبي من الكرة الأرضية.",
+      "في النصف الشمالي من الكرة الأرضية.",
+      "في النصف الغربي من الكرة الأرضية.",
+      "يمر بمنتصف الكرة الأرضية تماماً."
+    ],
+    correct: 0,
+    topic: "الإحداثيات الجغرافية",
+    explanation: "مدار الجدي يقع في النصف الجنوبي من الكرة الأرضية عند دائرة عرض 23.5° جنوباً، وهو الحد الجنوبي لتعامد أشعة الشمس."
+  },
+  {
+    q: "سَمّ خط الطول الأساسي (الرئيسي):",
+    options: [
+      "مدار جرينتش",
+      "خط السرطان",
+      "دائرة جرينتش",
+      "خط جرينتش"
+    ],
+    correct: 3,
+    topic: "الإحداثيات الجغرافية",
+    explanation: "خط الطول الأساسي هو خط جرينتش (درجة صفر)، ويمر ببلدة جرينتش في بريطانيا، ويقسم الأرض إلى نصف شرقي ونصف غربي."
+  },
+  {
+    q: "عَرّف الجبال:",
+    options: [
+      "هي أراضٍ منخفضة تبدأ من مستوى سطح البحر وتستمر لعدة أمتار.",
+      "هي مرتفعات ذات سطوح مستوية تمتد لعدة كيلومترات.",
+      "هي مرتفعات تبرز فوق سطح الأرض لمترات أو آلاف المترات.",
+      "هي بروزات صخرية تحيط بها السهول من جميع الجهات."
+    ],
+    correct: 2,
+    topic: "التضاريس وأشكال سطح الأرض",
+    explanation: "الجبال مرتفعات بارزة فوق سطح الأرض، يتراوح ارتفاعها من بضع مترات إلى آلاف المترات، وتتميّز بقمم مرتفعة وجوانب منحدرة."
+  },
+  {
+    q: "عَرّف الهضاب:",
+    options: [
+      "هي أراضٍ منخفضة ومستوية تشبه السهول وتتدرج في الارتفاع.",
+      "تشبه الجبال في ارتفاعها لكن سطحها مستوي وقليل الوعورة وتشبه السهول إلا أن جوانبها منحدرة.",
+      "هي مرتفعات حادة القمم وتشبه الجبال من حيث الانحدار والوعورة الشديدة.",
+      "هي أراضٍ واسعة منبسطة لا تزيد ارتفاعاتها عن بضع أمتار."
+    ],
+    correct: 1,
+    topic: "التضاريس وأشكال سطح الأرض",
+    explanation: "الهضاب تشبه الجبال في ارتفاعها، لكن سطحها مستوٍ وقليل الوعورة، وتشبه السهول في استواء سطحها مع جوانب منحدرة."
+  },
+  {
+    q: "عَرّف البراكين:",
+    options: [
+      "هي تشققات عميقة في القشرة الصلبة تخرج منها المياه الكبريتية والغازات.",
+      "هي فتحة في القشرة الأرضية الضعيفة تخرج منها مواد منصهرة وغازات وأبخرة.",
+      "هي تجاويف داخل القشرة الأرضية تندفع منها الأتربة والغازات السامة.",
+      "هي انكسارات في الصفائح الصخرية تؤدي لاندفاع الصخور الصلبة إلى الخارج."
+    ],
+    correct: 1,
+    topic: "البراكين",
+    explanation: "البركان فتحة في القشرة الأرضية الضعيفة تخرج منها المواد المنصهرة (اللافا) والغازات والأبخرة والرماد البركاني."
+  },
+  {
+    q: "عَرّف العوامل البطيئة:",
+    options: [
+      "هي حركات دائرية أو ملتوية سريعة تغير شكل القشرة الأرضية.",
+      "هي اهتزازات أرضية متكررة تصيب القشرة الأرضية ببطء.",
+      "هي حركات شاقولية أو أفقية بطيئة تصيب القشرة الأرضية.",
+      "هي انكسارات مفاجئة تحدث في أعماق القشرة الأرضية."
+    ],
+    correct: 2,
+    topic: "الزلازل والحركات الأرضية",
+    explanation: "العوامل البطيئة هي حركات شاقولية (رأسية) أو أفقية بطيئة تصيب القشرة الأرضية، ومنها الالتواءات، وتستغرق ملايين السنين."
+  },
+  {
+    q: "عَرّف التلال:",
+    options: [
+      "تشبه الهضاب إلا أنها أكثر ارتفاعاً ووعورة وانحداراً.",
+      "هي مرتفعات جبلية ضخمة تتميز بقمم حادة وانحدار شديد.",
+      "هي أراضٍ منبسطة تماماً ولا تحتوي على أي ارتفاعات أو وعورة.",
+      "تشبه الجبال إلا أنها أقل ارتفاعاً ووعورة وانحداراً."
+    ],
+    correct: 3,
+    topic: "التضاريس وأشكال سطح الأرض",
+    explanation: "التلال تشبه الجبال في شكلها، لكنها أقل ارتفاعاً وأقل وعورة وأقل انحداراً، لذلك تُعدّ شكلاً تضاريسياً وسطاً بين الجبال والسهول."
+  },
+  {
+    q: "عَدّد أقسام البركان:",
+    options: [
+      "الفوهة، السحابة البركانية، والقشرة الخارجية.",
+      "القناة الباطنية، البؤرة الصخرية، والمخروط الجبلي.",
+      "المخروط، الفوهة، والمدخنة.",
+      "العنق، غرفة الصهارة، والحزام الزلزالي."
+    ],
+    correct: 2,
+    topic: "البراكين",
+    explanation: "أقسام البركان الرئيسية ثلاثة: المخروط (الشكل الخارجي)، الفوهة (فتحة القمة)، والمدخنة (القناة التي تصعد عبرها المواد المنصهرة)."
+  },
+  {
+    q: "عَرّف السهول:",
+    options: [
+      "هي أراضٍ واسعة مستوية السطح قليلة الارتفاع بالنسبة لسطح الأرض.",
+      "هي مرتفعات واسعة حادة القمم وقليلة التضرس.",
+      "هي أراضٍ منخفضة ضيقة تحيط بها الجبال من كل جانب.",
+      "هي سطوح مائلة تتدرج ارتفاعاتها ببطء شديد."
+    ],
+    correct: 0,
+    topic: "التضاريس وأشكال سطح الأرض",
+    explanation: "السهول أراضٍ واسعة مستوية السطح قليلة الارتفاع، وهي من أفضل المناطق للزراعة والسكن لاستوائها وخصوبة تربتها."
+  },
+  {
+    q: "عَرّف الزلزال:",
+    options: [
+      "هي انكسارات بطيئة تستغرق ملايين السنين في القشرة الأرضية.",
+      "هي حركات أرضية سريعة تحدث فجأة تصيب القشرة الأرضية.",
+      "هي التواءات صخرية تشكل السلاسل الجبلية المرتفعة.",
+      "هي حركة المياه السطحية بفعل الرياح القوية والأمواج."
+    ],
+    correct: 1,
+    topic: "الزلازل والحركات الأرضية",
+    explanation: "الزلزال حركات أرضية سريعة تحدث فجأة في القشرة الأرضية نتيجة لانكسار الصخور وتحرّر الطاقة المخزونة فيها."
+  },
+  {
+    q: "عَلّل: أهمية التربة الزراعية البركانية:",
+    options: [
+      "تعد من أخصب الترب لغنائها بأكاسيد الحديد.",
+      "تحتوي على نسبة عالية من الرمال والأحجار الكلسية.",
+      "لأنها تربة جافة تمنع نمو الأعشاب الضارة.",
+      "لسرعة امتصاصها للجليد والمياه الكبريتية."
+    ],
+    correct: 0,
+    topic: "البراكين",
+    explanation: "التربة البركانية من أخصب أنواع الترب؛ لأنها غنية بأكاسيد الحديد والمعادن، لذلك تُزرع فيها المحاصيل بكثافة قرب البراكين."
+  },
+  {
+    q: "سَمّ جهاز رصد الزلازل:",
+    options: [
+      "مقياس البارومتر",
+      "مقياس الهيدرومتر",
+      "مقياس الثرمومتر",
+      "مقياس رختار (ريختر)"
+    ],
+    correct: 3,
+    topic: "الزلازل والحركات الأرضية",
+    explanation: "مقياس رختر (ريختر) هو المقياس المستخدم لقياس قوة الزلزال. أما البارومتر فلقياس الضغط الجوي، والثرمومتر للحرارة، والهيدرومتر لقياس كثافة السوائل."
+  },
+  {
+    q: "عَرّف الهزة الأرضية:",
+    options: [
+      "هي انكسار صخري ضخم في القشرة الأرضية يزيد عن 7 رختار.",
+      "هي كلمة تُستخدم للزلزال الخفيف الذي يقل عن 5 رختار (ريختر).",
+      "هي التواء صخري بطيء يحدث في أعماق المحيطات.",
+      "هي السحابة الناتجة عن ثوران البراكين الخامدة."
+    ],
+    correct: 1,
+    topic: "الزلازل والحركات الأرضية",
+    explanation: "الهزة الأرضية مصطلح يُطلق على الزلزال الخفيف الذي تقل قوته عن 5 درجات على مقياس رختر، ويكون أثره محدوداً."
+  },
+  {
+    q: "عَلّل: ما سبب تشكّل الالتواءات؟",
+    options: [
+      "لتَعَرُّض الطبقات اللينة في الصخر لحركات ضغط جانبي وشاقولي.",
+      "لتكسُّر الصخور القاسية والصلبة بفعل الانكسارات المفاجئة.",
+      "لتجمع الحمم البركانية والرماد على قمم الجبال المرتفعة.",
+      "لتعرّض الصخور للتعرية الريحية الشديدة ونحت الأودية."
+    ],
+    correct: 0,
+    topic: "الزلازل والحركات الأرضية",
+    explanation: "تتشكّل الالتواءات عندما تتعرّض الطبقات اللينة (المرنة) في الصخور لحركات ضغط جانبية أو شاقولية بطيئة، فتنثني وتُشكّل السلاسل الجبلية."
+  },
+  {
+    q: "سَمِّ ما يلي: عملية الترسيب:",
+    options: [
+      "تشكل الكثبان الرملية",
+      "تشكل السهول الفيضية",
+      "تشكل رؤوس الخلجان",
+      "تشكل الصحارى الحجرية"
+    ],
+    correct: 1,
+    topic: "التجوية والترسيب",
+    explanation: "الترسيب النهري (الفيضي) يؤدي إلى تشكّل السهول الفيضية؛ حيث يترسب الطمي الذي تحمله الأنهار عند ضفافها."
+  },
+  {
+    q: "سَمِّ ما يلي: النقل الريحي:",
+    options: [
+      "تشكل السهول الفيضية",
+      "الصحارى الرملية والحصوية والحجرية",
+      "تشكل السواحل الرملية",
+      "تشكل البحيرات البركانية"
+    ],
+    correct: 1,
+    topic: "التجوية والترسيب",
+    explanation: "النقل الريحي ينقل حبيبات الرمل والحصى والغبار، وينتج عنه أنواع الصحارى الثلاثة: الرملية والحصوية والحجرية."
+  },
+  {
+    q: "سَمِّ ما يلي: السهول الفيضية:",
+    options: [
+      "سهول دجلة والفرات ونهر البنج في الهند",
+      "سهول جبال الأطلس والهضاب",
+      "السواحل الرملية للبحار والمحيطات",
+      "الصحراء الكبرى والصحارى الحجرية"
+    ],
+    correct: 0,
+    topic: "التجوية والترسيب",
+    explanation: "سهول دجلة والفرات في العراق وسهول نهر البنج في الهند من أشهر السهول الفيضية، إذ تكوّنت بترسيب الطمي الذي حملته الأنهار."
+  },
+  {
+    q: "سَمِّ ما يلي: الترسيب الريحي:",
+    options: [
+      "رؤوس الخلجان",
+      "الكثبان الرملية",
+      "الأودية الجبلية",
+      "السهول الفيضية"
+    ],
+    correct: 1,
+    topic: "التجوية والترسيب",
+    explanation: "عندما تضعف قوة الرياح تترسب الحبيبات الرملية وتتكوّن الكثبان الرملية، وهذا ما يُعرف بالترسيب الريحي."
+  },
+  {
+    q: "سَمِّ ما يلي: حَتّ (نحت) الأمواج:",
+    options: [
+      "تشكل السهول الفيضية",
+      "تشكل الكثبان الرملية",
+      "رؤوس الخلجان",
+      "الصحارى الحصوية"
+    ],
+    correct: 2,
+    topic: "التجوية والترسيب",
+    explanation: "أمواج البحر تنحت الصخور الساحلية الصلبة وتُفتّتها، فيتقدّم البحر في اليابسة وتتشكّل رؤوس الخلجان والجزر."
+  },
+  {
+    q: "سَمِّ ما يلي: ترسيب الأمواج:",
+    options: [
+      "السواحل الرملية",
+      "البراكين الخامدة",
+      "الالتواءات الصخرية",
+      "السهول الفيضية"
+    ],
+    correct: 0,
+    topic: "التجوية والترسيب",
+    explanation: "عندما تهدأ الأمواج تترسب المواد التي حملتها (الرمل والحصى) على الشواطئ، فتتشكّل السواحل الرملية."
+  }
+];
+
+/* قائمة الموضوعات الخمسة للتحليل */
+const TOPICS = [
+  { key: "الإحداثيات الجغرافية",        icon: "🧭" },
+  { key: "التضاريس وأشكال سطح الأرض",   icon: "🏔️" },
+  { key: "البراكين",                    icon: "🌋" },
+  { key: "الزلازل والحركات الأرضية",    icon: "💥" },
+  { key: "التجوية والترسيب",            icon: "🏜️" }
+];
+
+const TOTAL_Q = QUESTIONS.length;
+const QUESTION_TIME = 30; // ثانية
+
+/* ==========================================================
+   2) عناصر الصفحة
+   ========================================================== */
+const $ = (id) => document.getElementById(id);
+const themeBtn   = $("themeBtn");
+const studentInput = $("studentName");
+const nameError  = $("nameError");
+const cardsGrid  = $("cardsGrid");
+
+const qCounter     = $("qCounter");
+const chipCorrect  = $("chipCorrect");
+const chipWrong    = $("chipWrong");
+const chipName     = $("chipName");
+const progressFill = $("progressFill");
+const timerFill    = $("timerFill");
+const timerText    = $("timerText");
+const topicLabel   = $("topicLabel");
+const questionText = $("questionText");
+const optionsWrap  = $("optionsWrap");
+const feedback     = $("feedback");
+const nextBtn      = $("nextBtn");
+
+let studentName = "";
+let timerId = null;
+let quizState = null;
+
+/* ==========================================================
+   3) أدوات مساعدة
+   ========================================================== */
+function shuffle(arr){
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+  const el = document.getElementById(id);
+  if (el) el.classList.add("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+function getStudentName(){
+  return studentInput.value.trim().replace(/\s+/g, " ");
+}
+function isValidName(name){
+  const parts = name.split(" ").filter(p => p.length > 0);
+  return parts.length >= 2 && parts.every(p => p.length >= 2);
+}
+
+/* ==========================================================
+   4) الوضع الليلي / النهاري
+   ========================================================== */
+function applyTheme(theme){
+  document.documentElement.setAttribute("data-theme", theme);
+  themeBtn.textContent = theme === "dark" ? "☀️ الوضع النهاري" : "🌙 الوضع الليلي";
+  try { localStorage.setItem("geo-theme", theme); } catch(e){}
+}
+(function initTheme(){
+  let saved = "light";
+  try { saved = localStorage.getItem("geo-theme") || "light"; } catch(e){}
+  applyTheme(saved);
+})();
+themeBtn.addEventListener("click", () => {
+  const current = document.documentElement.getAttribute("data-theme");
+  applyTheme(current === "dark" ? "light" : "dark");
+});
+
+/* ==========================================================
+   5) الصفحة الرئيسية — اختيار القسم
+   ========================================================== */
+$("btnCards").addEventListener("click", () => {
+  const name = getStudentName();
+  if (!isValidName(name)){
+    nameError.textContent = "⚠️ الرجاء كتابة الاسم الثنائي (الاسم الأول واسم العائلة) قبل البدء.";
+    studentInput.focus();
+    return;
+  }
+  nameError.textContent = "";
+  studentName = name;
+  buildFlashcards();
+  showScreen("screen-cards");
+});
+
+$("btnQuiz").addEventListener("click", () => {
+  const name = getStudentName();
+  if (!isValidName(name)){
+    nameError.textContent = "⚠️ الرجاء كتابة الاسم الثنائي (الاسم الأول واسم العائلة) قبل البدء.";
+    studentInput.focus();
+    return;
+  }
+  nameError.textContent = "";
+  studentName = name;
+  startQuiz();
+});
+
+studentInput.addEventListener("input", () => { nameError.textContent = ""; });
+studentInput.addEventListener("keydown", (e) => {
+  if (e.key === "Enter") $("btnCards").focus();
+});
+
+document.querySelectorAll("[data-home]").forEach(btn => {
+  btn.addEventListener("click", () => {
+    stopTimer();
+    showScreen("screen-home");
+  });
+});
+
+/* ==========================================================
+   6) بناء البطاقات التعليمية
+   ========================================================== */
+function buildFlashcards(){
+  const letters = ["أ","ب","ج","د"];
+  cardsGrid.innerHTML = "";
+
+  QUESTIONS.forEach((item, idx) => {
+    const card = document.createElement("div");
+    card.className = "flashcard";
+
+    const optsHTML = item.options
+      .map((opt, i) => `<li><strong>${letters[i]})</strong> ${opt}</li>`)
+      .join("");
+
+    card.innerHTML = `
+      <div class="fc-inner">
+        <div class="fc-face fc-front">
+          <span class="fc-num">بطاقة ${idx + 1}</span>
+          <span class="fc-topic">${item.topic}</span>
+          <p class="fc-q">${item.q}</p>
+          <ul class="fc-opts">${optsHTML}</ul>
+          <div class="fc-hint">👆 انقر لعرض الإجابة والشرح</div>
+        </div>
+        <div class="fc-face fc-back">
+          <span class="fc-num">الإجابة الصحيحة</span>
+          <p class="fc-answer"><b>${letters[item.correct]})</b> ${item.options[item.correct]}</p>
+          <p class="fc-exp"><strong>💡 الشرح:</strong> ${item.explanation}</p>
+          <div class="fc-hint">👆 انقر للعودة إلى السؤال</div>
+        </div>
+      </div>
+    `;
+
+    card.addEventListener("click", () => card.classList.toggle("flipped"));
+    cardsGrid.appendChild(card);
+  });
+}
+
+/* ==========================================================
+   7) منطق الاختبار
+   ========================================================== */
+function startQuiz(){
+  const order = shuffle(QUESTIONS.map((_, i) => i));
+
+  const items = order.map(i => {
+    const q = QUESTIONS[i];
+    const opts = q.options.map((text, idx) => ({ text, isCorrect: idx === q.correct }));
+    const shuffledOpts = shuffle(opts);
+    return {
+      q: q.q,
+      topic: q.topic,
+      explanation: q.explanation,
+      options: shuffledOpts,
+      correctIndex: shuffledOpts.findIndex(o => o.isCorrect)
+    };
+  });
+
+  const topicStats = {};
+  TOPICS.forEach(t => { topicStats[t.key] = { correct: 0, total: 0 }; });
+
+  quizState = {
+    items,
+    index: 0,
+    correctCount: 0,
+    wrongCount: 0,
+    topicStats,
+    missed: [],
+    answered: false,
+    timeLeft: QUESTION_TIME
+  };
+
+  chipName.textContent = "👤 " + studentName;
+  chipCorrect.textContent = "✔ 0";
+  chipWrong.textContent = "✘ 0";
+
+  showScreen("screen-quiz");
+  renderQuestion();
+}
+
+function renderQuestion(){
+  const item = quizState.items[quizState.index];
+  quizState.answered = false;
+
+  qCounter.textContent = `السؤال ${quizState.index + 1} من ${quizState.items.length}`;
+  chipCorrect.textContent = "✔ " + quizState.correctCount;
+  chipWrong.textContent = "✘ " + quizState.wrongCount;
+  progressFill.style.width = ((quizState.index) / quizState.items.length * 100) + "%";
+
+  topicLabel.textContent = item.topic;
+  questionText.textContent = item.q;
+
+  const letters = ["أ","ب","ج","د"];
+  optionsWrap.innerHTML = "";
+  item.options.forEach((opt, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "option";
+    btn.innerHTML = `<span class="letter">${letters[i]}</span><span class="otext">${opt.text}</span>`;
+    btn.addEventListener("click", () => selectAnswer(i));
+    optionsWrap.appendChild(btn);
+  });
+
+  feedback.className = "feedback hidden";
+  feedback.innerHTML = "";
+  nextBtn.classList.add("hidden");
+  nextBtn.textContent = (quizState.index === quizState.items.length - 1)
+    ? "🏆 عرض الشهادة"
+    : "السؤال التالي »";
+
+  startTimer();
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+/* ---------- المؤقت ---------- */
+function startTimer(){
+  stopTimer();
+  quizState.timeLeft = QUESTION_TIME;
+  updateTimerUI();
+
+  timerId = setInterval(() => {
+    quizState.timeLeft -= 0.1;
+    if (quizState.timeLeft <= 0){
+      quizState.timeLeft = 0;
+      updateTimerUI();
+      stopTimer();
+      handleTimeout();
+    } else {
+      updateTimerUI();
+    }
+  }, 100);
+}
+function stopTimer(){
+  if (timerId){ clearInterval(timerId); timerId = null; }
+}
+function updateTimerUI(){
+  const pct = Math.max(0, Math.min(100, (quizState.timeLeft / QUESTION_TIME) * 100));
+  timerFill.style.width = pct + "%";
+  const hue = Math.round(pct * 1.2); // 0 = أحمر ، 120 = أخضر
+  timerFill.style.background =
+    `linear-gradient(90deg, hsl(${hue}, 85%, 42%), hsl(${hue}, 90%, 55%))`;
+  timerText.textContent = Math.ceil(quizState.timeLeft) + " ث";
+}
+
+/* ---------- الإجابة ---------- */
+function selectAnswer(selectedIndex){
+  if (quizState.answered) return;
+  quizState.answered = true;
+  stopTimer();
+
+  const item = quizState.items[quizState.index];
+  const isCorrect = selectedIndex === item.correctIndex;
+
+  if (isCorrect){
+    quizState.correctCount++;
+  } else {
+    quizState.wrongCount++;
+    quizState.missed.push({
+      q: item.q,
+      correct: item.options[item.correctIndex].text,
+      topic: item.topic
+    });
+  }
+  recordTopic(item.topic, isCorrect);
+  revealAnswer(selectedIndex);
+}
+
+function handleTimeout(){
+  if (quizState.answered) return;
+  quizState.answered = true;
+
+  const item = quizState.items[quizState.index];
+  quizState.wrongCount++;
+  quizState.missed.push({
+    q: item.q,
+    correct: item.options[item.correctIndex].text,
+    topic: item.topic
+  });
+  recordTopic(item.topic, false);
+  revealAnswer(-1);
+}
+
+function recordTopic(topic, isCorrect){
+  const st = quizState.topicStats[topic];
+  if (!st) return;
+  st.total++;
+  if (isCorrect) st.correct++;
+}
+
+function revealAnswer(selectedIndex){
+  const item = quizState.items[quizState.index];
+  const btns = Array.from(optionsWrap.children);
+
+  btns.forEach((btn, idx) => {
+    btn.disabled = true;
+    if (idx === item.correctIndex) btn.classList.add("correct");
+    else if (idx === selectedIndex) btn.classList.add("wrong");
+  });
+
+  let cls = "feedback", title = "";
+  if (selectedIndex === -1){
+    cls += " warn";
+    title = "⏰ انتهى الوقت!";
+  } else if (selectedIndex === item.correctIndex){
+    cls += " good";
+    title = "✅ إجابة صحيحة! أحسنت 👏";
+  } else {
+    cls += " bad";
+    title = "❌ إجابة خاطئة";
+  }
+
+  feedback.className = cls;
+  feedback.innerHTML = `
+    <h4>${title}</h4>
+    <p>الإجابة الصحيحة هي: <strong>${item.options[item.correctIndex].text}</strong></p>
+    <p class="exp">💡 <strong>الشرح:</strong> ${item.explanation}</p>
+  `;
+
+  chipCorrect.textContent = "✔ " + quizState.correctCount;
+  chipWrong.textContent = "✘ " + quizState.wrongCount;
+
+  nextBtn.classList.remove("hidden");
+  nextBtn.focus({ preventScroll: true });
+}
+
+nextBtn.addEventListener("click", () => {
+  quizState.index++;
+  if (quizState.index >= quizState.items.length){
+    finishQuiz();
+  } else {
+    renderQuestion();
+  }
+});
+
+$("quitQuiz").addEventListener("click", () => {
+  stopTimer();
+  showScreen("screen-home");
+});
+
+/* ==========================================================
+   8) إنهاء الاختبار وبناء الشهادة
+   ========================================================== */
+function finishQuiz(){
+  stopTimer();
+  progressFill.style.width = "100%";
+
+  const correct = quizState.correctCount;
+  const wrong   = quizState.wrongCount;
+  const pct     = Math.round((correct / TOTAL_Q) * 100);
+
+  $("certName").textContent = studentName;
+  $("certScore").textContent = `${correct} / ${TOTAL_Q}`;
+  $("certPct").textContent = pct + "%";
+  $("certCorrect").textContent = correct;
+  $("certWrong").textContent = wrong;
+
+  const bar = $("certBar");
+  bar.style.width = "0%";
+  bar.textContent = pct + "%";
+  setTimeout(() => { bar.style.width = pct + "%"; }, 120);
+
+  // التاريخ
+  const today = new Date();
+  $("certDate").textContent = today.toLocaleDateString("ar-EG", {
+    year: "numeric", month: "long", day: "numeric"
+  });
+
+  // التحليل حسب الموضوعات
+  const analysisWrap = $("topicAnalysis");
+  analysisWrap.innerHTML = "";
+  const strengths = [];
+  const weaknesses = [];
+
+  TOPICS.forEach(t => {
+    const st = quizState.topicStats[t.key] || { correct: 0, total: 0 };
+    const tPct = st.total ? Math.round((st.correct / st.total) * 100) : 0;
+    let color = "#16a34a";
+    if (tPct < 70) color = "#f59e0b";
+    if (tPct < 50) color = "#dc2626";
+    if (st.total === 0) color = "#94a3b8";
+
+    const row = document.createElement("div");
+    row.className = "topic-row";
+    row.innerHTML = `
+      <div class="t-top">
+        <span>${t.icon} ${t.key}</span>
+        <span>${st.correct} / ${st.total} — ${tPct}%</span>
+      </div>
+      <div class="topic-track">
+        <div style="width:0%;background:${color}" data-w="${tPct}%"></div>
+      </div>
+    `;
+    analysisWrap.appendChild(row);
+
+    if (st.total > 0){
+      if (tPct >= 70) strengths.push({ label: `${t.icon} ${t.key} (${tPct}%)`, good: true });
+      else weaknesses.push({ label: `${t.icon} ${t.key} (${tPct}%)`, good: false });
+    }
+  });
+
+  // تحريك الأشرطة
+  setTimeout(() => {
+    analysisWrap.querySelectorAll(".topic-track > div").forEach(d => {
+      d.style.width = d.getAttribute("data-w");
+    });
+  }, 150);
+
+  // نقاط القوة
+  const strengthsWrap = $("strengths");
+  strengthsWrap.innerHTML = "";
+  if (strengths.length){
+    strengths.forEach(s => {
+      const sp = document.createElement("span");
+      sp.className = "tag-pill good";
+      sp.textContent = "💪 " + s.label;
+      strengthsWrap.appendChild(sp);
+    });
+  } else {
+    strengthsWrap.innerHTML = `<span class="tag-pill">لا توجد موضوعات بتقييم مرتفع بعد — بالمراجعة ستتحسّن النتيجة بإذن الله.</span>`;
+  }
+
+  // نقاط الضعف
+  const weakWrap = $("weaknesses");
+  weakWrap.innerHTML = "";
+  if (weaknesses.length){
+    weaknesses.forEach(w => {
+      const sp = document.createElement("span");
+      sp.className = "tag-pill bad";
+      sp.textContent = "📌 " + w.label;
+      weakWrap.appendChild(sp);
+    });
+  } else {
+    weakWrap.innerHTML = `<span class="tag-pill good">🎉 ما شاء الله! لا توجد نقاط ضعف واضحة، أداء ممتاز في جميع الموضوعات.</span>`;
+  }
+
+  // الأسئلة التي تحتاج مراجعة
+  const missedList = $("missedList");
+  missedList.innerHTML = "";
+  if (quizState.missed.length === 0){
+    missedList.innerHTML = `<li>🎉 لم تُخطئ في أي سؤال! نتيجة كاملة رائعة.</li>`;
+  } else {
+    quizState.missed.forEach((m, i) => {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${i + 1})</strong> ${m.q}<br>
+        <span style="color:var(--muted);font-size:.8rem;">الموضوع: ${m.topic}</span><br>
+        الإجابة الصحيحة: <b>${m.correct}</b>`;
+      missedList.appendChild(li);
+    });
+  }
+
+  showScreen("screen-cert");
+}
+
+/* ==========================================================
+   9) أزرار الشهادة
+   ========================================================== */
+$("printBtn").addEventListener("click", () => {
+  window.print();
+});
+
+$("retryBtn").addEventListener("click", () => {
+  startQuiz();
+});
+
+/* ==========================================================
+   10) تهيئة أولية
+   ========================================================== */
+buildFlashcards();
+studentInput.focus();
+</script>
+</body>
+</html>
